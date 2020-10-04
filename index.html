@@ -34,6 +34,7 @@
             </p>
         </div>
         
+        <input type = "button" id = "playbutton" value = "Play" onclick = "startGame(); document.getElementById('playbutton').style.display='none'"/>
         
         <canvas id="snakeboard" width="400" height="400"></canvas>
         
@@ -43,6 +44,7 @@
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
+                z-index: 1;
             }
             
             #score {
@@ -51,24 +53,12 @@
                 font-family: arial;
             }
             
-            .container-fluid {
-                float:left
-            }
-
-            .row {
-                text-align:center; 
-                width:auto; 
-                height:auto
-            }
-
-            .row:nth-child(2) div {
-                display:inline-block; 
-                line-height:250px; 
-                vertical-align:middle; 
-                margin:.25em; 
-                padding:0; 
-                height:auto; 
-                width:auto
+            #playbutton {
+                z-index: 2;
+                position: absolute;
+                top: 300px;
+                left: 620px;
+                display: block;
             }
         </style>
         
@@ -98,21 +88,24 @@
         
         let snake = [{x: 200, y: 200},  {x: 190, y: 200},  {x: 180, y: 200},  {x: 170, y: 200},  {x: 160, y: 200}];
         
-        let stars = [{x: 0, y: 150, c:'s'}, {x: 40, y: 190, c: 's'}, {x: 80, y: 240, c: 's'}, {x: 90, y: 270, c: 's'}, {x: 110, y: 260, c: 's'},
-            {x: 80, y: 380, c: 'o'}, {x: 80, y: 150, c:'o'}, {x: 120, y: 70, c: 'o'}, {x: 140, y: 320, c: 'o'}, {x: 210, y: 120, c: 'o'},
-            {x: 210, y: 290, c: 'o'}, {x: 250, y: 250, c: 'o'}, {x: 40, y: 120, c: 'o'},
-            {x: 310, y: 30, c: 's'}, {x: 290, y: 60, c: 's'}, {x: 320, y: 60, c: 's'}, {x: 340, y: 110, c: 's'}, {x: 310, y: 160, c: 's'},
-            {x: 290, y: 180, c: 's'}, {x: 300, y: 230, c: 's'}]
+        let stars = [{x: 0, y: 150, c:'s'}, {x: 40, y: 190, c: 's'}, {x: 80, y: 240, c: 's'}, {x: 90, y: 270, c: 's'}, {x: 110, y: 260, c: 's'}, //4
+            {x: 120, y: 70, c: 'o'}, {x: 40, y: 120, c: 'o'}, {x: 210, y: 120, c: 'o'}, {x: 80, y: 150, c:'o'}, {x: 250, y: 250, c: 'o'},    
+            {x: 210, y: 290, c: 'o'}, {x: 140, y: 320, c: 'o'}, {x: 80, y: 380, c: 'o'},
+            {x: 310, y: 30, c: 's'}, {x: 290, y: 60, c: 's'}, {x: 320, y: 60, c: 's'}, {x: 340, y: 110, c: 's'}, {x: 310, y: 160, c: 's'}, //17
+            {x: 290, y: 180, c: 's'}, {x: 300, y: 230, c: 's'}]; //19
         
         let usedStars = [];
-            
-        //Let's start our game!
-        main();
         
-        //Variables to store food, generate first food
+        //2D array to track the indices of the stars we wanna connect
+        let sLines = [[0,1], [1,2], [2,3], [3,4], [13,14], [13,15], [14,15], [15,16], [16,17], [17,18], [18,19]];
+        let oLines = [[5,7], [5,8], [6,8], [7,9], [8,11], [9,10], [10,11], [11,12]];
+            
+        //Draw the canvas, so it's visible all the time.
+        clearCanvas();
+        
+        //Variables to store food
         var food_y;
         var food_x;
-        genFood();
         
         //Variable to store score, which fact you're on, array of fact's div's ids
         score = 0;
@@ -120,12 +113,34 @@
         facts = ['hideaway', 'hideaway2', 'hideaway3'];
         var numFacts = facts.length;
         
+        //Function to set all needed variables, then call main
+        function startGame() {
+            snake = [{x: 200, y: 200},  {x: 190, y: 200},  {x: 180, y: 200},  {x: 170, y: 200},  {x: 160, y: 200}];
+            
+            stars = [{x: 0, y: 150, c:'s'}, {x: 40, y: 190, c: 's'}, {x: 80, y: 240, c: 's'}, {x: 90, y: 270, c: 's'}, {x: 110, y: 260, c: 's'}, //4
+            {x: 120, y: 70, c: 'o'}, {x: 40, y: 120, c: 'o'}, {x: 210, y: 120, c: 'o'}, {x: 80, y: 150, c:'o'}, {x: 250, y: 250, c: 'o'},    
+            {x: 210, y: 290, c: 'o'}, {x: 140, y: 320, c: 'o'}, {x: 80, y: 380, c: 'o'},
+            {x: 310, y: 30, c: 's'}, {x: 290, y: 60, c: 's'}, {x: 320, y: 60, c: 's'}, {x: 340, y: 110, c: 's'}, {x: 310, y: 160, c: 's'}, //17
+            {x: 290, y: 180, c: 's'}, {x: 300, y: 230, c: 's'}];
+            
+            usedStars = [];
+            
+            score = 0;
+            document.getElementById('score').innerHTML = score; //Display score
+            
+            genFood();
+            
+            main();
+        }
+        
         //main function called repeatedly to keep the game running
         function main() {
             //If the game is over, end.
             if (hasGameEnded()) {
                 clearCanvas();
                 drawFood();
+                if (score >= 200) drawLines();
+                document.getElementById('playbutton').style.display='block';
                 return;
             }
             
@@ -133,6 +148,7 @@
             setTimeout(function onTick() {
                 clearCanvas();
                 moveSnake();
+                if (score == 200) drawLines(); //Draw the lines if the game is over.
                 drawSnake();
                 drawFood();
                 changingDirection = false;
@@ -295,6 +311,25 @@
             //Draw food
             snakeboard_ctx.fillRect(food_x, food_y, 10, 10);
             snakeboard_ctx.strokeRect(food_x, food_y, 10, 10);
+        }
+        
+        //Draw the lines between the stars
+        function drawLines() {
+            snakeboard_ctx.strokeStyle = serp_border;
+            for (let i = 0; i < sLines.length; i++) {
+                snakeboard_ctx.beginPath();
+                snakeboard_ctx.moveTo(stars[sLines[i][0]].x+5, stars[sLines[i][0]].y+5);
+                snakeboard_ctx.lineTo(stars[sLines[i][1]].x+5, stars[sLines[i][1]].y+5);
+                snakeboard_ctx.stroke();
+            }
+            
+            snakeboard_ctx.strokeStyle = oph_border;
+            for (let i = 0; i < oLines.length; i++) {
+                snakeboard_ctx.beginPath();
+                snakeboard_ctx.moveTo(stars[oLines[i][0]].x+5, stars[oLines[i][0]].y+5);
+                snakeboard_ctx.lineTo(stars[oLines[i][1]].x+5, stars[oLines[i][1]].y+5);
+                snakeboard_ctx.stroke();
+            }
         }
         
         
