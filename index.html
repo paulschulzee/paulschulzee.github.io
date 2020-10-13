@@ -15,22 +15,39 @@
         
         <div id="hideaway" style="display:none;">
             <p>
-            This is where we'll put fun facts about Ophiuchus <br>
-            And Serpens, of course.
+            While there's no evidence for Ophiuchus being recognized <br>
+            preclassically, in Babylonian astronomy a "Sittings Gods" <br>
+            constellation seems to have been located nearby.
             </p>
         </div>
         
         <div id="hideaway2" style="display:none;">
             <p>
-            There are 20 dots, so that's 20 facts. <br>
-            Except I don't know how to write on the rights, so probably <br>
-            less than that. Maybe 5 facts? 1 every 4?
+            The earliest mention of Ophiuchus is in Aratus, 4th century BCE. <br>
+            Eudoxus of Cnidus seems to have been the first to write about it.<br>
             </p>
         </div>
         
         <div id="hideaway3" style="display:none">
             <p>
-            Anyways. Have fun!
+            The supernova of 1604, AKA Kepler's Supernova because of how <br>
+            much Kepler studied it, was first observed in Ophiuchus near <br>
+            Theta Ophiuchi.
+            </p>
+        </div>
+        
+        <div id="hideaway4" style="display:none">
+            <p>
+            Voyager 1 is the furthest man-made object from Earth, and it's <br>
+            heading towards Ophiuchus!
+            </p>
+        </div>
+        
+        <div id="hideaway5" style="display:none">
+            <p>
+            The first detection of molecular oxygen in space was made <br>
+            following observations in Ophiuchus! It was done by the Odin <br>
+            satellite.
             </p>
         </div>
         
@@ -110,7 +127,7 @@
         //Variable to store score, which fact you're on, array of fact's div's ids
         score = 0;
         var fact = 0;
-        facts = ['hideaway', 'hideaway2', 'hideaway3'];
+        facts = ['hideaway', 'hideaway2', 'hideaway3', 'hideaway4', 'hideaway5'];
         var numFacts = facts.length;
         
         //Function to set all needed variables, then call main
@@ -191,7 +208,7 @@
                 score += 10; //Increase score
                 document.getElementById('score').innerHTML = score; //Display score
                 //Display the next fact, fact++. 
-                document.getElementById(facts[Math.min(facts.length - 1, fact++)]).style.display='block'; 
+                if (score % 40 == 0) document.getElementById(facts[Math.min(facts.length - 1, fact++)]).style.display='block'; 
             } else { //if no food eaten
                 snake.pop(); //To represent motion
             }
